@@ -161,7 +161,7 @@ def chosen_method_targets() -> List[Path]:
 
 
 def build():
-    graphblas_include, graphblas_library = suitesparse_build()
+    graphblas_include, graphblas_library = suitesparse_do_chosen_method()
 
     graphblas_include = graphblas_include.absolute()
     graphblas_library = graphblas_library.absolute()

@@ -98,9 +98,9 @@ TOOL_CONFIG: Dict[ToolName, ToolConfigurations] = {
         sources=DEPS / 'lagraph',
         build=DEPS / 'lagraph' / 'build',
         algo_rel={
-            AlgorithmName.bfs:  Path('sources') / 'benchmark' / 'bfs_demo',
-            AlgorithmName.sssp: Path('sources') / 'benchmark' / 'sssp_demo',
-            AlgorithmName.tc:   Path('sources') / 'benchmark' / 'tc_demo'
+            AlgorithmName.bfs:  Path('src') / 'benchmark' / 'bfs_demo',
+            AlgorithmName.sssp: Path('src') / 'benchmark' / 'sssp_demo',
+            AlgorithmName.tc:   Path('src') / 'benchmark' / 'tc_demo'
         },
         config=Namespace()
     ),
@@ -109,9 +109,9 @@ TOOL_CONFIG: Dict[ToolName, ToolConfigurations] = {
         sources=DEPS / 'spla',
         build=DEPS / 'spla' / 'build',
         algo_rel={
-            AlgorithmName.bfs:  Path('spla_bfs'),
-            AlgorithmName.sssp: Path('spla_sssp'),
-            AlgorithmName.tc:   Path('spla_tc')
+            AlgorithmName.bfs:  Path('bfs'),
+            AlgorithmName.sssp: Path('sssp'),
+            AlgorithmName.tc:   Path('tc')
         },
         config=Namespace()
     ),
@@ -201,28 +201,31 @@ SUITESPARSE = Namespace(
     # Paths to the local version of suitesparse
     local=Namespace(
         # Path to the include directory (Ex. "../graphblas/include/")
-        include=None,
+        include= "/usr/local/include",
         # Path to the library (Ex. "../graphblas/lib/libgraphblas.so")
-        library=None
+        library="/usr/local/lib/libgraphblas.dylib",
     ),
 
     # GitHub repository information
-    repo=Namespace(
-        url='https://github.com/DrTimothyAldenDavis/GraphBLAS',
-        branch='v6.1.4',
+    repo=None,
 
-        # Repository local path (where it will be cloned)
-        dest=DEPS/'suitesparse_graphblast',
+    # Uncomment, if you want to clone the repo
+    # repo=Namespace(
+    #     url='https://github.com/DrTimothyAldenDavis/GraphBLAS',
+    #     branch='v6.1.4',
 
-        # Relative path to the include directory from the repository root
-        include_rel=Path('Include'),
+    #     # Repository local path (where it will be cloned)
+    #     dest=DEPS/'suitesparse_graphblast',
 
-        # Relative path to the build directory, where the library will be built
-        build_rel=Path('build'),
+    #     # Relative path to the include directory from the repository root
+    #     include_rel=Path('Include'),
 
-        # Relative path to the library binary
-        library_rel=(Path('build') / 'libgraphblas').with_suffix(TARGET_SUFFIX)
-    ),
+    #     # Relative path to the build directory, where the library will be built
+    #     build_rel=Path('build'),
+
+    #     # Relative path to the library binary
+    #     library_rel=(Path('build') / 'libgraphblas').with_suffix(TARGET_SUFFIX)
+    # ),
 
     # Conda repository information
     download=None,
@@ -356,16 +359,16 @@ or to the .mtx
 
 """
 BENCHMARK_DATASETS = [
-    '1128_bus',
-    'bcspwr03',
-    'soc-LiveJournal',
-    'hollywood-09',
-    'com-Orcut',
-    'roadNet-CA',
-    'indochina-2004',
-    'cit-Patents',
+    # '1128_bus',
+    # 'bcspwr03',
+    # 'soc-LiveJournal',
+    # 'hollywood-09',
+    # 'com-Orcut',
+    # 'roadNet-CA',
+    # 'indochina-2004',
+    # 'cit-Patents',
     'coAuthorsCiteseer',
-    'coPapersDBLP'
+    # 'coPapersDBLP'
 ]
 
 """

@@ -25,7 +25,8 @@ def build():
 
     check_call(
         [
-            "make", config.jobs_flag()
+            'cmake',
+            '--build', SPLA_PATHS.build,
+            '--parallel', str(config.BUILD.jobs)
         ],
-        cwd=SPLA_PATHS.build
     )

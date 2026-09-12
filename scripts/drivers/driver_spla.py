@@ -1,4 +1,5 @@
 import drivers.driver as driver
+import re
 
 from lib.dataset import Dataset
 from lib.algorithm import AlgorithmName
@@ -69,7 +70,24 @@ class DriverSpla(driver.Driver):
         runs = []
         for line in lines:
             if line.startswith("warm-up(ms):"):
-                warmup = float(line.split(" ")[1])
-            if line.startswith("iters(ms):"):
-                runs = [float(v) for v in line.split(" ")[1:-1]]
+                values = DriverSpla._parse_times(line)
+                if values:
+                    warmup = values[0]
+            elif line.startswith(("gpu(ms):", "iters(ms):")):
+                runs = DriverSpla._parse_times(line)
+
+        if not runs:
+            raise ValueError(
+                "SPLA output does not contain GPU timings "
+                "(expected `gpu(ms):`)"
+            )
+
         return driver.ExecutionResult(warmup, runs)
+
+    @staticmethod
+    def _parse_times(line):
+        values = line.split(":", 1)[1]
+        return [
+            float(value)
+            for value in re.findall(r"[-+]?(?:\d+\.\d+|\d+)", values)
+        ]

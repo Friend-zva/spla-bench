@@ -3,6 +3,7 @@
 import argparse
 
 from typing import List
+from pathlib import Path
 
 import config
 import lib.util as util
@@ -41,6 +42,7 @@ def main():
                         choices=list(ToolName),
                         help='Select tool to use (otherwise all tools are benchmarked)')
     parser.add_argument('--output',
+                        type=Path,
                         default=config.BENCHMARK_OUTPUT,
                         help='File to dump benchmark results')
     parser.add_argument('--format',

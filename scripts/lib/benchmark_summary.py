@@ -95,12 +95,12 @@ class BenchmarkSummary:
 
     def dump(self, format: OutputFormat, output_dir: Path, results_printer: Callable):
         output_dir.mkdir(exist_ok=True)
-        output = output_dir / datetime.ctime(datetime.now())
+        output = output_dir / datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f')
         output.mkdir(exist_ok=False)
         recent_link = output_dir / 'recent'
-        if recent_link.exists():
-            os.remove(recent_link)
-        os.symlink(output, recent_link, target_is_directory=True)
+        if recent_link.exists() or recent_link.is_symlink():
+            recent_link.unlink()
+        os.symlink(output.name, recent_link, target_is_directory=True)
 
         print_status('summary', 'dump', f'symlink: {recent_link}, original: {output}')
 
