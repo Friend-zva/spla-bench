@@ -54,8 +54,8 @@ class Driver:
         * bfs
         * sssp
         * tc
+        * pr
         * [future] cc
-        * [future] page rank
     """
 
     @abc.abstractmethod
@@ -68,6 +68,10 @@ class Driver:
 
     @abc.abstractmethod
     def can_run_tc(self, dataset: Dataset) -> bool:
+        return False
+
+    @abc.abstractmethod
+    def can_run_pr(self, dataset: Dataset) -> bool:
         return False
 
     @abc.abstractmethod
@@ -114,6 +118,13 @@ class Driver:
         pass
 
     @abc.abstractmethod
+    def run_pr(self,
+               dataset: Dataset,
+               num_iterations: int) -> ExecutionResult:
+        raise NotImplementedError(
+            f'{self.tool_name()} does not support page rank')
+
+    @abc.abstractmethod
     def tool_name(self) -> ToolName:
         """
         :return: Name of the underhood tool
@@ -133,7 +144,8 @@ class Driver:
         can_run = {
             AlgorithmName.bfs: self.can_run_bfs,
             AlgorithmName.sssp: self.can_run_sssp,
-            AlgorithmName.tc: self.can_run_tc
+            AlgorithmName.tc: self.can_run_tc,
+            AlgorithmName.pr: self.can_run_pr
         }
         return can_run[algo](dataset)
 
@@ -160,6 +172,8 @@ class Driver:
             result = self.run_sssp(dataset, source, iterations)
         elif algo == AlgorithmName.tc:
             result = self.run_tc(dataset, iterations)
+        elif algo == AlgorithmName.pr:
+            result = self.run_pr(dataset, iterations)
 
         self.print_status(
             'run', f'finish {str(algo.name)}', result.brief_str())

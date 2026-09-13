@@ -100,7 +100,8 @@ TOOL_CONFIG: Dict[ToolName, ToolConfigurations] = {
         algo_rel={
             AlgorithmName.bfs:  Path('src') / 'benchmark' / 'bfs_demo',
             AlgorithmName.sssp: Path('src') / 'benchmark' / 'sssp_demo',
-            AlgorithmName.tc:   Path('src') / 'benchmark' / 'tc_demo'
+            AlgorithmName.tc:   Path('src') / 'benchmark' / 'tc_demo',
+            AlgorithmName.pr:   Path('src') / 'benchmark' / 'gappagerank_demo'
         },
         config=Namespace()
     ),
@@ -111,7 +112,8 @@ TOOL_CONFIG: Dict[ToolName, ToolConfigurations] = {
         algo_rel={
             AlgorithmName.bfs:  Path('bfs'),
             AlgorithmName.sssp: Path('sssp'),
-            AlgorithmName.tc:   Path('tc')
+            AlgorithmName.tc:   Path('tc'),
+            AlgorithmName.pr:   Path('pr')
         },
         config=Namespace()
     ),

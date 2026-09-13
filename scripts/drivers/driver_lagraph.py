@@ -20,6 +20,9 @@ class DriverLaGraph(Driver):
     def can_run_tc(self, dataset: Dataset) -> bool:
         return True
 
+    def can_run_pr(self, dataset: Dataset) -> bool:
+        return True
+
     def run_bfs(self,
                 dataset: Dataset,
                 source_vertex: int,
@@ -58,6 +61,18 @@ class DriverLaGraph(Driver):
         ])
 
         return DriverLaGraph._parse_output(output, "trial ", 2, "nthreads: ", 3)
+
+    def run_pr(self,
+               dataset: Dataset,
+               num_iterations: int) -> ExecutionResult:
+
+        output = check_output([
+            self.exec_path(AlgorithmName.pr),
+            dataset.path
+        ])
+
+        return DriverLaGraph._parse_output(
+            output, "trial:", 3, "warmup:", 1)
 
     def tool_name(self) -> ToolName:
         return ToolName.lagraph

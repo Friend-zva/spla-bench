@@ -11,8 +11,8 @@ Part of the Spla research project.
 - BFS (breadth-first search) for directed graphs with arbitrary values (only structure required)
 - SSSP (single-source the shortest paths) for directed graphs with float values
 - TC (triangles counting) for directed graphs (integer values stored)
+- PR (PageRank) for SPLA and LAGraph
 - **Future:** CC (connected components)
-- **Future:** PageRank
 
 ### Frameworks
 
@@ -150,14 +150,14 @@ To run benchmarks, just execute it
 
 ```shell
 $ ./scripts/benchmark.py -h
-usage: benchmark.py [-h] [--algo {bfs,tc,sssp}] [--tool {graphblast,spla,lagraph,gunrock}] [--output OUTPUT]
+usage: benchmark.py [-h] [--algo {bfs,tc,sssp,pr}] [--tool {graphblast,spla,lagraph,gunrock}] [--output OUTPUT]
                     [--format {OutputFormat.raw,OutputFormat.csv}] [--printer {all,median}]
 
 Bebchmarking tool for the graph algorithms
 
 optional arguments:
   -h, --help            show this help message and exit
-  --algo {bfs,tc,sssp}  Select algorithm to run (otherwise all algorithms are benchmarked)
+  --algo {bfs,tc,sssp,pr}  Select algorithm to run (otherwise all algorithms are benchmarked)
   --tool {graphblast,spla,lagraph,gunrock}
                         Select tool to use (otherwise all tools are benchmarked)
   --output OUTPUT       File to dump benchmark results

@@ -22,6 +22,9 @@ class DriverGunrock(driver.Driver):
     def can_run_tc(self, dataset: Dataset) -> bool:
         raise NotImplementedError()
 
+    def can_run_pr(self, dataset: Dataset) -> bool:
+        return False
+
     def run_bfs(self,
                 dataset: Dataset,
                 source_vertex: int,
