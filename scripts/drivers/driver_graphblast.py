@@ -1,11 +1,8 @@
-import subprocess
-
-import drivers.driver as driver
 import config
-
+from drivers import driver
 from lib.algorithm import AlgorithmName
-from lib.tool import ToolName
 from lib.dataset import Dataset
+from lib.tool import ToolName
 from lib.util import check_output
 
 
@@ -28,50 +25,58 @@ class DriverGraphBLAST(driver.Driver):
     def can_run_pr(self, dataset: Dataset) -> bool:
         return False
 
-    def run_bfs(self,
-                dataset: Dataset,
-                source_vertex: int,
-                num_iterations: int) -> driver.ExecutionResult:
+    def run_bfs(
+        self, dataset: Dataset, source_vertex: int, num_iterations: int
+    ) -> driver.ExecutionResult:
 
         directed_flag = 1 if dataset.get_directed() else 2
 
-        output = check_output([str(self.exec_path(AlgorithmName.bfs)),
-                               f"--source={source_vertex}",
-                               f"--niter={num_iterations}",
-                               f"--timing={self.timing}",
-                               f"--directed={directed_flag}",
-                               f"--skip_cpu_verify={self.skip_cpu_verify}",
-                               str(dataset.path)])
+        output = check_output(
+            [
+                str(self.exec_path(AlgorithmName.bfs)),
+                f"--source={source_vertex}",
+                f"--niter={num_iterations}",
+                f"--timing={self.timing}",
+                f"--directed={directed_flag}",
+                f"--skip_cpu_verify={self.skip_cpu_verify}",
+                str(dataset.path),
+            ]
+        )
         return DriverGraphBLAST._parse_output(output, num_iterations)
 
-    def run_sssp(self,
-                 dataset: Dataset,
-                 source_vertex: int,
-                 num_iterations: int) -> driver.ExecutionResult:
+    def run_sssp(
+        self, dataset: Dataset, source_vertex: int, num_iterations: int
+    ) -> driver.ExecutionResult:
 
         directed_flag = 1 if dataset.get_directed() else 2
 
-        output = check_output([str(self.exec_path(AlgorithmName.sssp)),
-                               f"--source={source_vertex}",
-                               f"--niter={num_iterations}",
-                               f"--timing={self.timing}",
-                               f"--directed={directed_flag}",
-                               f"--skip_cpu_verify={self.skip_cpu_verify}",
-                               str(dataset.path)])
+        output = check_output(
+            [
+                str(self.exec_path(AlgorithmName.sssp)),
+                f"--source={source_vertex}",
+                f"--niter={num_iterations}",
+                f"--timing={self.timing}",
+                f"--directed={directed_flag}",
+                f"--skip_cpu_verify={self.skip_cpu_verify}",
+                str(dataset.path),
+            ]
+        )
         return DriverGraphBLAST._parse_output(output, num_iterations)
 
-    def run_tc(self,
-               dataset: Dataset,
-               num_iterations: int) -> driver.ExecutionResult:
+    def run_tc(self, dataset: Dataset, num_iterations: int) -> driver.ExecutionResult:
 
         directed_flag = 1 if dataset.get_directed() else 2
 
-        output = check_output([str(self.exec_path(AlgorithmName.tc)),
-                               f"--niter={num_iterations}",
-                               f"--timing={self.timing}",
-                               f"--directed={directed_flag}",
-                               f"--skip_cpu_verify={self.skip_cpu_verify}",
-                               str(dataset.path)])
+        output = check_output(
+            [
+                str(self.exec_path(AlgorithmName.tc)),
+                f"--niter={num_iterations}",
+                f"--timing={self.timing}",
+                f"--directed={directed_flag}",
+                f"--skip_cpu_verify={self.skip_cpu_verify}",
+                str(dataset.path),
+            ]
+        )
         return DriverGraphBLAST._parse_output(output, num_iterations)
 
     def tool_name(self) -> ToolName:

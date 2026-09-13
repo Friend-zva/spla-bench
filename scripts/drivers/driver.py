@@ -1,17 +1,15 @@
 import abc
 import statistics
-
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List
 
-import lib.util as util
-import config as config
-
-from lib.dataset import Dataset
+import config
 from build.build import build_tool
-from lib.tool import ToolName
+from lib import util
 from lib.algorithm import AlgorithmName
+from lib.dataset import Dataset
+from lib.tool import ToolName
 
 
 @dataclass
@@ -19,6 +17,7 @@ class ExecutionResult:
     """
     Result of the execution of the single algorithm benchmark run
     """
+
     warm_up: int
     times: List[int]
 
@@ -32,7 +31,7 @@ class ExecutionResult:
         return statistics.stdev(self.times)
 
     def brief_str(self) -> str:
-        return f'warm_up={self.warm_up:.2f}ms, avg={self.avg():.2f}ms, median={self.median():.2f}ms, stdev={self.stdev():.2f}'
+        return f"warm_up={self.warm_up:.2f}ms, avg={self.avg():.2f}ms, median={self.median():.2f}ms, stdev={self.stdev():.2f}"
 
     def __str__(self) -> str:
         return self.brief_str()
@@ -75,10 +74,9 @@ class Driver:
         return False
 
     @abc.abstractmethod
-    def run_bfs(self,
-                dataset: Dataset,
-                source_vertex: int,
-                num_iterations: int) -> ExecutionResult:
+    def run_bfs(
+        self, dataset: Dataset, source_vertex: int, num_iterations: int
+    ) -> ExecutionResult:
         """
         Run bfs algorithm benchmark.
 
@@ -90,10 +88,9 @@ class Driver:
         pass
 
     @abc.abstractmethod
-    def run_sssp(self,
-                 dataset: Dataset,
-                 source_vertex: int,
-                 num_iterations: int) -> ExecutionResult:
+    def run_sssp(
+        self, dataset: Dataset, source_vertex: int, num_iterations: int
+    ) -> ExecutionResult:
         """
         Run sssp algorithm benchmark.
 
@@ -105,9 +102,7 @@ class Driver:
         pass
 
     @abc.abstractmethod
-    def run_tc(self,
-               dataset: Dataset,
-               num_iterations: int) -> ExecutionResult:
+    def run_tc(self, dataset: Dataset, num_iterations: int) -> ExecutionResult:
         """
         Run tc algorithm benchmark.
 
@@ -118,11 +113,8 @@ class Driver:
         pass
 
     @abc.abstractmethod
-    def run_pr(self,
-               dataset: Dataset,
-               num_iterations: int) -> ExecutionResult:
-        raise NotImplementedError(
-            f'{self.tool_name()} does not support page rank')
+    def run_pr(self, dataset: Dataset, num_iterations: int) -> ExecutionResult:
+        raise NotImplementedError(f"{self.tool_name()} does not support page rank")
 
     @abc.abstractmethod
     def tool_name(self) -> ToolName:
@@ -145,24 +137,24 @@ class Driver:
             AlgorithmName.bfs: self.can_run_bfs,
             AlgorithmName.sssp: self.can_run_sssp,
             AlgorithmName.tc: self.can_run_tc,
-            AlgorithmName.pr: self.can_run_pr
+            AlgorithmName.pr: self.can_run_pr,
         }
         return can_run[algo](dataset)
 
     def run(self, dataset: Dataset, algo: AlgorithmName) -> ExecutionResult:
         if not self.can_run(dataset, algo):
             raise Exception(
-                f'Algorithm {str(algo)} can not be run on the dataset {dataset.name}')
+                f"Algorithm {str(algo)} can not be run on the dataset {dataset.name}"
+            )
 
         dataset_category = dataset.get_category()
 
         iterations = dataset_category.iterations()
         source = config.DEFAULT_SOURCE
 
-        self.print_status('run',
-                          f'begin {algo.name}',
-                          f'iterations={iterations}',
-                          f'soure={source}')
+        self.print_status(
+            "run", f"begin {algo.name}", f"iterations={iterations}", f"soure={source}"
+        )
 
         result: ExecutionResult = None
 
@@ -175,7 +167,6 @@ class Driver:
         elif algo == AlgorithmName.pr:
             result = self.run_pr(dataset, iterations)
 
-        self.print_status(
-            'run', f'finish {str(algo.name)}', result.brief_str())
+        self.print_status("run", f"finish {str(algo.name)}", result.brief_str())
 
         return result

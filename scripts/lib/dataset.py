@@ -1,18 +1,15 @@
-from dataclasses import dataclass
-import os
-import tempfile
-import shutil
 import json
-
+import os
+import shutil
+import tempfile
+from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
 from operator import concat
-from typing import List, Any, Optional, Type, Callable, Dict
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Type
 
 import config
-import lib.progress as progress
-import lib.util as util
-import lib.matrix as matrix
+from lib import matrix, progress, util
 
 
 def download_by_url(url: str, dest: Path):
@@ -23,16 +20,18 @@ def download_by_url(url: str, dest: Path):
     with tempfile.TemporaryDirectory() as temp_folder_name:
         temp_folder = Path(temp_folder_name)
 
-        archive_path = temp_folder / 'archive'
-        archive_folder = temp_folder / 'unarchived'
+        archive_path = temp_folder / "archive"
+        archive_folder = temp_folder / "unarchived"
 
         os.makedirs(archive_folder)
 
-        util.print_status('dataset installer', 'downloading',
-                          f'{url} -> {archive_path}')
+        util.print_status(
+            "dataset installer", "downloading", f"{url} -> {archive_path}"
+        )
         progress.download(url, archive_path)
-        util.print_status('dataset installer', 'unarchiving',
-                          f'{archive_path} -> {archive_folder}')
+        util.print_status(
+            "dataset installer", "unarchiving", f"{archive_path} -> {archive_folder}"
+        )
         progress.unarchive(archive_path, archive_folder)
 
         archive_contents: List[Path] = []
@@ -40,32 +39,34 @@ def download_by_url(url: str, dest: Path):
             archive_folder = Path(dirpath)
             archive_contents.extend(map(Path, filenames + dirnames))
 
-        archive_contents = list(filter(
-            lambda filename: filename.suffix == '.mtx',
-            archive_contents
-        ))
+        archive_contents = list(
+            filter(lambda filename: filename.suffix == ".mtx", archive_contents)
+        )
 
-        contents_str = archive_contents[0] if len(archive_contents) == 1 else concat(
-            *map(lambda s: '\n\t- ' + str(s), archive_contents)
+        contents_str = (
+            archive_contents[0]
+            if len(archive_contents) == 1
+            else concat(*map(lambda s: "\n\t- " + str(s), archive_contents))
         )
 
         if not archive_contents:
-            raise Exception(
-                f'Archive {url} does not contain .mtx file: {contents_str}')
+            raise Exception(f"Archive {url} does not contain .mtx file: {contents_str}")
 
         mtx_file = archive_contents[0]
 
         srcs: List[Path] = [archive_folder / mtx_file]
         dests: List[Path] = [dest]
 
-        util.print_status('dataset installer', 'copying .mtx files')
+        util.print_status("dataset installer", "copying .mtx files")
 
         if len(archive_contents) > 1:
             dest_folder = util.parent_directory(dest)
-            util.print_status('dataset installer',
-                              'copying .mtx files',
-                              f'Archive contains more than two .mtx files: {contents_str}',
-                              f'\nThey all be put in the {dest_folder}')
+            util.print_status(
+                "dataset installer",
+                "copying .mtx files",
+                f"Archive contains more than two .mtx files: {contents_str}",
+                f"\nThey all be put in the {dest_folder}",
+            )
 
             srcs = []
             dests = []
@@ -76,7 +77,9 @@ def download_by_url(url: str, dest: Path):
         assert len(srcs) == len(dests)
 
         for src, dst in zip(srcs, dests):
-            util.print_status('dataset installer', 'copying .mtx files', f'{src} -> {dst}')
+            util.print_status(
+                "dataset installer", "copying .mtx files", f"{src} -> {dst}"
+            )
             shutil.copyfile(src, dst)
 
 
@@ -84,7 +87,7 @@ class DatasetPropertiesCache:
     def load_properties() -> Dict:
         config.DATASETS_PROPERTIES.touch()
         properties: Dict = None
-        with config.DATASETS_PROPERTIES.open('r') as prop_file:
+        with config.DATASETS_PROPERTIES.open("r") as prop_file:
             try:
                 properties = json.load(prop_file)
             except json.decoder.JSONDecodeError as e:
@@ -100,7 +103,7 @@ class DatasetPropertiesCache:
             properties[dataset_name] = {}
         properties[dataset_name][key] = value
 
-        with config.DATASETS_PROPERTIES.open('w') as prop_file:
+        with config.DATASETS_PROPERTIES.open("w") as prop_file:
             prop_file.write(json.dumps(properties))
 
     def get(dataset_name: str, key: Any) -> Any:
@@ -121,7 +124,7 @@ class DatasetPropertiesCache:
 
 
 def make_dest_path(name: str) -> Path:
-    file_name = f'{name}.mtx'
+    file_name = f"{name}.mtx"
     return config.DATASET_FOLDER / file_name
 
 
@@ -130,36 +133,37 @@ def download(name: str) -> Path:
     if dest.exists():
         return
     if config.DATASET_URL[name] is None:
-        raise Exception(f'Url to the dataset {name} is not set')
+        raise Exception(f"Url to the dataset {name} is not set")
     download_by_url(config.DATASET_URL[name], dest)
     if not dest.exists():
-        raise Exception(f'Can not download dataset {name}')
+        raise Exception(f"Can not download dataset {name}")
     return dest
 
 
 def get_dataset(name: str) -> Path:
     dataset_local_path = make_dest_path(name)
 
-    has_cached = DatasetPropertiesCache.get(name, 'path') is not None
+    has_cached = DatasetPropertiesCache.get(name, "path") is not None
     has_url = name in config.DATASET_URL
     is_downloaded = dataset_local_path.exists()
 
     if not any([has_cached, has_url, is_downloaded]):
         raise Exception(
-            f'Dataset {name} is not cached, does not have url nor downloaded')
+            f"Dataset {name} is not cached, does not have url nor downloaded"
+        )
 
     def get_dataset_named():
         if has_url and not is_downloaded:
             download(name)
         return str(dataset_local_path)
 
-    return Path(DatasetPropertiesCache.get_or_eval(name, 'path', get_dataset_named))
+    return Path(DatasetPropertiesCache.get_or_eval(name, "path", get_dataset_named))
 
 
 class DatasetValueType(Enum):
-    float = (float, 'float')
-    void = (type(None), 'void')
-    int = (int, 'int')
+    float = (float, "float")
+    void = (type(None), "void")
+    int = (int, "int")
 
     def to_type(self) -> Type:
         return self.value[0]
@@ -174,16 +178,16 @@ def dataset_type_from_type(python_type: Type) -> DatasetValueType:
     for dataset_type in list(DatasetValueType):
         if python_type == dataset_type.to_type():
             return dataset_type
-    raise Exception(f'Can not build dataset type from {python_type}')
+    raise Exception(f"Can not build dataset type from {python_type}")
 
 
 def dataset_type_from_repr(type_name: str) -> DatasetValueType:
-    if type_name == 'none':
+    if type_name == "none":
         return None
     for dataset_type in list(DatasetValueType):
         if type_name == str(dataset_type):
             return dataset_type
-    raise Exception(f'Can not build dataset type from {type_name}')
+    raise Exception(f"Can not build dataset type from {type_name}")
 
 
 @dataclass
@@ -202,9 +206,10 @@ class Dataset:
         def calculate_directed():
             matrix_data = matrix.load(self.path)
             return matrix.is_directed(matrix_data)
+
         return DatasetPropertiesCache.get_or_eval(
             self.name,
-            'directed',
+            "directed",
             calculate_directed,
         )
 
@@ -212,15 +217,17 @@ class Dataset:
         def calculate_type():
             matrix_data = matrix.load(self.path)
             return str(dataset_type_from_type(matrix.value_type(matrix_data)))
-        return dataset_type_from_repr(DatasetPropertiesCache.get_or_eval(
-            self.name,
-            'element_type',
-            calculate_type))
+
+        return dataset_type_from_repr(
+            DatasetPropertiesCache.get_or_eval(
+                self.name, "element_type", calculate_type
+            )
+        )
 
     def get_properties(self) -> DatasetProperties:
         return DatasetProperties(
-            directed=self.get_directed(),
-            element_type=self.get_element_type())
+            directed=self.get_directed(), element_type=self.get_element_type()
+        )
 
     def get_edges(self) -> int:
         _, _, nvals = matrix.load_header(self.path)

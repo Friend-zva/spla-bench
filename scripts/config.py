@@ -1,26 +1,22 @@
-import platform
 import os
-
+import platform
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional
-from types import SimpleNamespace as Namespace
 from enum import Enum
+from pathlib import Path
+from types import SimpleNamespace as Namespace
+from typing import Dict, List, Optional
 
 import lib.util as util
-
-from lib.tool import ToolName
 from lib.algorithm import AlgorithmName
-
+from lib.tool import ToolName
 
 """
 System information
 """
 
-SYSTEM = {'Darwin': 'macos', 'Linux': 'linux',
-          'Windows': 'windows'}[platform.system()]
-EXECUTABLE_EXT = {'macos': '', 'windows': '.exe', 'linux': ''}[SYSTEM]
-TARGET_SUFFIX = {'macos': '.dylib', 'linux': '.so', 'windows': '.dll'}[SYSTEM]
+SYSTEM = {"Darwin": "macos", "Linux": "linux", "Windows": "windows"}[platform.system()]
+EXECUTABLE_EXT = {"macos": "", "windows": ".exe", "linux": ""}[SYSTEM]
+TARGET_SUFFIX = {"macos": ".dylib", "linux": ".so", "windows": ".dll"}[SYSTEM]
 
 
 """
@@ -32,15 +28,14 @@ ROOT = Path(__file__).parent.parent
 
 # Path to the directory, where datasets will be downloaded
 # [MUTABLE]
-DATASET_FOLDER = ROOT / 'dataset'
+DATASET_FOLDER = ROOT / "dataset"
 
 # Path to the deps dataset
-DEPS = ROOT / 'deps'
+DEPS = ROOT / "deps"
 
 
 @dataclass
 class ToolConfigurations:
-
     """
     Paths and other information about the third party tools
     """
@@ -74,20 +69,20 @@ class ToolConfigurations:
 
 
 class SmArchitecture(Enum):
-    SM10 = 'SM10'
-    SM13 = 'SM13'
-    SM20 = 'SM20'
-    SM30 = 'SM30'
-    SM35 = 'SM35'
-    SM37 = 'SM37'
-    SM50 = 'SM50'
-    SM52 = 'SM52'
-    SM60 = 'SM60'
-    SM61 = 'SM61'
-    SM70 = 'SM70'
-    SM72 = 'SM72'
-    SM75 = 'SM75'
-    SM80 = 'SM80'
+    SM10 = "SM10"
+    SM13 = "SM13"
+    SM20 = "SM20"
+    SM30 = "SM30"
+    SM35 = "SM35"
+    SM37 = "SM37"
+    SM50 = "SM50"
+    SM52 = "SM52"
+    SM60 = "SM60"
+    SM61 = "SM61"
+    SM70 = "SM70"
+    SM72 = "SM72"
+    SM75 = "SM75"
+    SM80 = "SM80"
 
     def __str__(self):
         return self.value
@@ -95,71 +90,68 @@ class SmArchitecture(Enum):
 
 TOOL_CONFIG: Dict[ToolName, ToolConfigurations] = {
     ToolName.lagraph: ToolConfigurations(
-        sources=DEPS / 'lagraph',
-        build=DEPS / 'lagraph' / 'build',
+        sources=DEPS / "lagraph",
+        build=DEPS / "lagraph" / "build",
         algo_rel={
-            AlgorithmName.bfs:  Path('src') / 'benchmark' / 'bfs_demo',
-            AlgorithmName.sssp: Path('src') / 'benchmark' / 'sssp_demo',
-            AlgorithmName.tc:   Path('src') / 'benchmark' / 'tc_demo',
-            AlgorithmName.pr:   Path('src') / 'benchmark' / 'gappagerank_demo'
+            AlgorithmName.bfs: Path("src") / "benchmark" / "bfs_demo",
+            AlgorithmName.sssp: Path("src") / "benchmark" / "sssp_demo",
+            AlgorithmName.tc: Path("src") / "benchmark" / "tc_demo",
+            AlgorithmName.pr: Path("src") / "benchmark" / "gappagerank_demo",
         },
-        config=Namespace()
+        config=Namespace(),
     ),
-
     ToolName.spla: ToolConfigurations(
-        sources=DEPS / 'spla',
-        build=DEPS / 'spla' / 'build',
+        sources=DEPS / "spla",
+        build=DEPS / "spla" / "build",
         algo_rel={
-            AlgorithmName.bfs:  Path('bfs'),
-            AlgorithmName.sssp: Path('sssp'),
-            AlgorithmName.tc:   Path('tc'),
-            AlgorithmName.pr:   Path('pr')
+            AlgorithmName.bfs: Path("bfs"),
+            AlgorithmName.sssp: Path("sssp"),
+            AlgorithmName.tc: Path("tc"),
+            AlgorithmName.pr: Path("pr"),
         },
-        config=Namespace()
+        config=Namespace(),
     ),
-
     ToolName.graphblast: ToolConfigurations(
-        sources=DEPS / 'graphblast',
-        build=DEPS / 'graphblast' / 'bin',
+        sources=DEPS / "graphblast",
+        build=DEPS / "graphblast" / "bin",
         algo_rel={
-            AlgorithmName.bfs:  Path('gbfs'),
-            AlgorithmName.sssp: Path('gsssp'),
-            AlgorithmName.tc:   Path('gtc')
+            AlgorithmName.bfs: Path("gbfs"),
+            AlgorithmName.sssp: Path("gsssp"),
+            AlgorithmName.tc: Path("gtc"),
         },
         config=Namespace(
             # 0: do not display per iteration timing, 1: display per iteration timing
             # [MUTABLE]
             timing=0,
-
             # False: run CPU verification, True: skip CPU algorithm verification
             # [MUTABLE]
-            skip_cpu_verify=False
-        )
+            skip_cpu_verify=False,
+        ),
     ),
-
     ToolName.gunrock: ToolConfigurations(
-        sources=DEPS / 'gunrock',
-        build=DEPS / 'gunrock' / 'build',
+        sources=DEPS / "gunrock",
+        build=DEPS / "gunrock" / "build",
         algo_rel={
-            AlgorithmName.bfs:  Path('') / 'bin' / 'bfs',
-            AlgorithmName.sssp: Path('') / 'bin' / 'sssp',
-            AlgorithmName.tc:   Path('') / 'bin' / 'gtc',
+            AlgorithmName.bfs: Path("") / "bin" / "bfs",
+            AlgorithmName.sssp: Path("") / "bin" / "sssp",
+            AlgorithmName.tc: Path("") / "bin" / "gtc",
         },
         config=Namespace(
             # Autodetect target architecture
             # [MUTABLE]
             autodetect=True,
-
             # Target sm and compute architecture
             # [MUTABLE]
-            gencode=SmArchitecture.SM61
-        )
-    )
+            gencode=SmArchitecture.SM61,
+        ),
+    ),
 }
 
 
 def tool_algo_exec_path(name: ToolName, algo: AlgorithmName):
-    return TOOL_CONFIG[name].build / TOOL_CONFIG[name].algo_rel[algo].with_suffix(EXECUTABLE_EXT)
+    return TOOL_CONFIG[name].build / TOOL_CONFIG[name].algo_rel[algo].with_suffix(
+        EXECUTABLE_EXT
+    )
 
 
 """
@@ -169,19 +161,9 @@ Conda repository with GraphBLAS build
 
 """
 CONDA_GRB_REPO = Namespace(
-    hash={
-        'macos': 'h4a89273',
-        'windows': 'h0e60522',
-        'linux': 'h9c3ff4c'
-    }[SYSTEM],
-
-    platform={
-        'macos': 'osx-64',
-        'windows': 'win-64',
-        'linux': 'linux-64'
-    }[SYSTEM],
-
-    version='6.1.4'
+    hash={"macos": "h4a89273", "windows": "h0e60522", "linux": "h9c3ff4c"}[SYSTEM],
+    platform={"macos": "osx-64", "windows": "win-64", "linux": "linux-64"}[SYSTEM],
+    version="6.1.4",
 )
 
 """
@@ -199,39 +181,30 @@ and set corresponding values to non-null values
 
 """
 SUITESPARSE = Namespace(
-
     # Paths to the local version of suitesparse
     local=Namespace(
         # Path to the include directory (Ex. "../graphblas/include/")
-        include= "/usr/local/include",
+        include="/usr/local/include",
         # Path to the library (Ex. "../graphblas/lib/libgraphblas.so")
         library="/usr/local/lib/libgraphblas.dylib",
     ),
-
     # GitHub repository information
     repo=None,
-
     # Uncomment, if you want to clone the repo
     # repo=Namespace(
     #     url='https://github.com/DrTimothyAldenDavis/GraphBLAS',
     #     branch='v6.1.4',
-
     #     # Repository local path (where it will be cloned)
     #     dest=DEPS/'suitesparse_graphblast',
-
     #     # Relative path to the include directory from the repository root
     #     include_rel=Path('Include'),
-
     #     # Relative path to the build directory, where the library will be built
     #     build_rel=Path('build'),
-
     #     # Relative path to the library binary
     #     library_rel=(Path('build') / 'libgraphblas').with_suffix(TARGET_SUFFIX)
     # ),
-
     # Conda repository information
     download=None,
-
     # Uncomment, if you want to download the library
     # download=Namespace(
     #     url=f'https://anaconda.org/conda-forge/graphblas/{CONDA_GRB_REPO.version}/download/{CONDA_GRB_REPO.platform}/graphblas-{CONDA_GRB_REPO.version}-{CONDA_GRB_REPO.hash}_0.tar.bz2',
@@ -250,8 +223,7 @@ BUILD = Namespace(
     # Paths to the C/C++/Cuda compilers (let Cmake detect by default)
     cc=None,
     cxx=None,
-    cudacxx='/usr/bin/g++-8',
-
+    cudacxx="/usr/bin/g++-8",
     # Number of jobs to build all sources (None will remove flag)
     jobs=6,
 )
@@ -284,6 +256,7 @@ class DatasetSize(Enum):
 
     [MUTABLE]
     """
+
     # `size` = DatasetSizeInfo(`max_edges`, `iterations`)
     tiny = DatasetSizeInfo(max_n_edges=5000, iterations=50)
     small = DatasetSizeInfo(max_n_edges=80000, iterations=20)
@@ -301,7 +274,7 @@ class DatasetSize(Enum):
         for d_size in list(DatasetSize):
             if d_size.max_n_edges() is None or d_size.max_n_edges() >= n_edges:
                 return d_size
-        raise Exception(f'Can not get largeness category of {n_edges} edges')
+        raise Exception(f"Can not get largeness category of {n_edges} edges")
 
 
 """
@@ -314,7 +287,7 @@ This file is created automatically
 [MUTABLE]
 
 """
-DATASETS_PROPERTIES = DATASET_FOLDER / 'properties.json'
+DATASETS_PROPERTIES = DATASET_FOLDER / "properties.json"
 
 """
 Urls of the datasets and their names
@@ -329,17 +302,17 @@ Note: All datasets are taken from http://sparse.tamu.edu/
 
 """
 DATASET_URL: Dict[str, str] = {
-    '1128_bus': 'https://suitesparse-collection-website.herokuapp.com/MM/HB/1138_bus.tar.gz',
-    'bcspwr03': 'https://suitesparse-collection-website.herokuapp.com/MM/HB/bcspwr03.tar.gz',
-    'soc-LiveJournal': 'https://suitesparse-collection-website.herokuapp.com/MM/SNAP/soc-LiveJournal1.tar.gz',
-    'hollywood-09': 'https://suitesparse-collection-website.herokuapp.com/MM/LAW/hollywood-2009.tar.gz',
-    'Journals': 'https://suitesparse-collection-website.herokuapp.com/MM/Pajek/Journals.tar.gz',
-    'com-Orcut': 'https://suitesparse-collection-website.herokuapp.com/MM/SNAP/com-Orkut.tar.gz',
-    'roadNet-CA': 'https://suitesparse-collection-website.herokuapp.com/MM/SNAP/roadNet-CA.tar.gz',
-    'indochina-2004': 'https://suitesparse-collection-website.herokuapp.com/MM/LAW/indochina-2004.tar.gz',
-    'cit-Patents': 'https://suitesparse-collection-website.herokuapp.com/MM/SNAP/cit-Patents.tar.gz',
-    'coAuthorsCiteseer': 'https://suitesparse-collection-website.herokuapp.com/MM/DIMACS10/coAuthorsCiteseer.tar.gz',
-    'coPapersDBLP': 'https://suitesparse-collection-website.herokuapp.com/MM/DIMACS10/coPapersDBLP.tar.gz'
+    "1128_bus": "https://suitesparse-collection-website.herokuapp.com/MM/HB/1138_bus.tar.gz",
+    "bcspwr03": "https://suitesparse-collection-website.herokuapp.com/MM/HB/bcspwr03.tar.gz",
+    "soc-LiveJournal": "https://suitesparse-collection-website.herokuapp.com/MM/SNAP/soc-LiveJournal1.tar.gz",
+    "hollywood-09": "https://suitesparse-collection-website.herokuapp.com/MM/LAW/hollywood-2009.tar.gz",
+    "Journals": "https://suitesparse-collection-website.herokuapp.com/MM/Pajek/Journals.tar.gz",
+    "com-Orcut": "https://suitesparse-collection-website.herokuapp.com/MM/SNAP/com-Orkut.tar.gz",
+    "roadNet-CA": "https://suitesparse-collection-website.herokuapp.com/MM/SNAP/roadNet-CA.tar.gz",
+    "indochina-2004": "https://suitesparse-collection-website.herokuapp.com/MM/LAW/indochina-2004.tar.gz",
+    "cit-Patents": "https://suitesparse-collection-website.herokuapp.com/MM/SNAP/cit-Patents.tar.gz",
+    "coAuthorsCiteseer": "https://suitesparse-collection-website.herokuapp.com/MM/DIMACS10/coAuthorsCiteseer.tar.gz",
+    "coPapersDBLP": "https://suitesparse-collection-website.herokuapp.com/MM/DIMACS10/coPapersDBLP.tar.gz",
 }
 
 
@@ -369,7 +342,7 @@ BENCHMARK_DATASETS = [
     # 'roadNet-CA',
     # 'indochina-2004',
     # 'cit-Patents',
-    'coAuthorsCiteseer',
+    "coAuthorsCiteseer",
     # 'coPapersDBLP'
 ]
 
@@ -386,29 +359,25 @@ of the most recent benchmarks run.
 [MUTABLE]
 
 """
-BENCHMARK_OUTPUT = ROOT / 'benchmarks'
+BENCHMARK_OUTPUT = ROOT / "benchmarks"
 
 
 def jobs_flag() -> str:
     assert BUILD.jobs > 0
     if BUILD.jobs is None:
-        return ''
-    return f'-j{BUILD.jobs}'
+        return ""
+    return f"-j{BUILD.jobs}"
 
 
 def make_build_env() -> Dict[str, str]:
     env = os.environ.copy()
 
-    additional_vars = {
-        'CC': BUILD.cc,
-        'CXX': BUILD.cxx,
-        'CUDAHOSTCXX': BUILD.cudacxx
-    }
+    additional_vars = {"CC": BUILD.cc, "CXX": BUILD.cxx, "CUDAHOSTCXX": BUILD.cudacxx}
 
     for k, v in additional_vars.items():
         if v is not None:
             env[k] = str(v)
 
-    print(f'Using env: {additional_vars}')
+    print(f"Using env: {additional_vars}")
 
     return env

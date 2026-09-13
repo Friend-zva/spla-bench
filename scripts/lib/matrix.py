@@ -1,8 +1,6 @@
 import random
-
-from typing import List, Tuple, Union, Callable, Type, Optional, FrozenSet, Set
 from pathlib import Path
-
+from typing import Callable, FrozenSet, List, Optional, Set, Tuple, Type, Union
 
 MatrixValueType = Union[int, float]
 ValuedMatrixEntry = Tuple[int, int, MatrixValueType]
@@ -12,7 +10,7 @@ Void = type(None)
 
 
 def remove_comment(line: str) -> str:
-    return line[:line.find("%")] if line else None
+    return line[: line.find("%")] if line else None
 
 
 def reader_header(line_iter) -> str:
@@ -23,16 +21,16 @@ def reader_header(line_iter) -> str:
 
 
 def load_header(path: Path) -> Tuple[int, int, int]:
-    with path.open('r') as file:
+    with path.open("r") as file:
         line = file.readline()
-        while line.startswith('%'):
+        while line.startswith("%"):
             line = file.readline()
-        n, m, nvals = map(int, line.split(' '))
+        n, m, nvals = map(int, line.split(" "))
         return n, m, nvals
 
 
 def value_type_of_repr(repr: str) -> MatrixValueType:
-    if '.' in repr:
+    if "." in repr:
         return float(repr)
     return int(repr)
 
@@ -123,7 +121,7 @@ def make_type_generator(t: Type) -> Callable[[], MatrixValueType]:
         return random.random
     elif t == int:
         return lambda: random.randint(1, 100)
-    raise Exception(f'Unable to generate type {t.name}')
+    raise Exception(f"Unable to generate type {t.name}")
 
 
 def generate_values(matrix: MatrixData, generator: Callable[[], MatrixValueType]):

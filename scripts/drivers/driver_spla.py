@@ -1,10 +1,9 @@
-import drivers.driver as driver
 import re
 
-from lib.dataset import Dataset
+from drivers import driver
 from lib.algorithm import AlgorithmName
+from lib.dataset import Dataset, DatasetValueType
 from lib.tool import ToolName
-from lib.dataset import DatasetValueType
 from lib.util import check_output
 
 
@@ -21,57 +20,59 @@ class DriverSpla(driver.Driver):
     def can_run_pr(self, dataset: Dataset) -> bool:
         return True
 
-    def run_bfs(self,
-                dataset: Dataset,
-                source_vertex: int,
-                num_iterations: int) -> driver.ExecutionResult:
+    def run_bfs(
+        self, dataset: Dataset, source_vertex: int, num_iterations: int
+    ) -> driver.ExecutionResult:
 
-        output = check_output([
-            self.exec_path(AlgorithmName.bfs),
-            f"--mtxpath={dataset.path}",
-            f"--niters={num_iterations}",
-            f"--source={source_vertex}"
-        ])
-
-        return DriverSpla._parse_output(output)
-
-    def run_sssp(self,
-                 dataset: Dataset,
-                 source_vertex: int,
-                 num_iterations: int) -> driver.ExecutionResult:
-
-        output = check_output([
-            self.exec_path(AlgorithmName.sssp),
-            f"--mtxpath={dataset.path}",
-            f"--niters={num_iterations}",
-            f"--source={source_vertex}"
-        ])
+        output = check_output(
+            [
+                self.exec_path(AlgorithmName.bfs),
+                f"--mtxpath={dataset.path}",
+                f"--niters={num_iterations}",
+                f"--source={source_vertex}",
+            ]
+        )
 
         return DriverSpla._parse_output(output)
 
-    def run_tc(self,
-               dataset: Dataset,
-               num_iterations: int) -> driver.ExecutionResult:
+    def run_sssp(
+        self, dataset: Dataset, source_vertex: int, num_iterations: int
+    ) -> driver.ExecutionResult:
 
-        dir_flag = 'true' if not dataset.get_directed() else 'false'
+        output = check_output(
+            [
+                self.exec_path(AlgorithmName.sssp),
+                f"--mtxpath={dataset.path}",
+                f"--niters={num_iterations}",
+                f"--source={source_vertex}",
+            ]
+        )
 
-        output = check_output([
-            self.exec_path(AlgorithmName.tc),
-            f"--mtxpath={dataset.path}",
-            f"--niters={num_iterations}",
-            f"--undirected={dir_flag}"
-        ])
         return DriverSpla._parse_output(output)
 
-    def run_pr(self,
-               dataset: Dataset,
-               num_iterations: int) -> driver.ExecutionResult:
+    def run_tc(self, dataset: Dataset, num_iterations: int) -> driver.ExecutionResult:
 
-        output = check_output([
-            self.exec_path(AlgorithmName.pr),
-            f"--mtxpath={dataset.path}",
-            f"--niters={num_iterations}"
-        ])
+        dir_flag = "true" if not dataset.get_directed() else "false"
+
+        output = check_output(
+            [
+                self.exec_path(AlgorithmName.tc),
+                f"--mtxpath={dataset.path}",
+                f"--niters={num_iterations}",
+                f"--undirected={dir_flag}",
+            ]
+        )
+        return DriverSpla._parse_output(output)
+
+    def run_pr(self, dataset: Dataset, num_iterations: int) -> driver.ExecutionResult:
+
+        output = check_output(
+            [
+                self.exec_path(AlgorithmName.pr),
+                f"--mtxpath={dataset.path}",
+                f"--niters={num_iterations}",
+            ]
+        )
         return DriverSpla._parse_output(output)
 
     def tool_name(self) -> ToolName:
@@ -92,8 +93,7 @@ class DriverSpla(driver.Driver):
 
         if not runs:
             raise ValueError(
-                "SPLA output does not contain GPU timings "
-                "(expected `gpu(ms):`)"
+                "SPLA output does not contain GPU timings (expected `gpu(ms):`)"
             )
 
         return driver.ExecutionResult(warmup, runs)
@@ -101,7 +101,4 @@ class DriverSpla(driver.Driver):
     @staticmethod
     def _parse_times(line):
         values = line.split(":", 1)[1]
-        return [
-            float(value)
-            for value in re.findall(r"[-+]?(?:\d+\.\d+|\d+)", values)
-        ]
+        return [float(value) for value in re.findall(r"[-+]?(?:\d+\.\d+|\d+)", values)]

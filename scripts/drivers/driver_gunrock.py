@@ -1,7 +1,6 @@
-import drivers.driver as driver
-
-from lib.dataset import Dataset
+from drivers import driver
 from lib.algorithm import AlgorithmName
+from lib.dataset import Dataset
 from lib.tool import ToolName
 from lib.util import check_output
 
@@ -25,44 +24,52 @@ class DriverGunrock(driver.Driver):
     def can_run_pr(self, dataset: Dataset) -> bool:
         return False
 
-    def run_bfs(self,
-                dataset: Dataset,
-                source_vertex: int,
-                num_iterations: int) -> driver.ExecutionResult:
+    def run_bfs(
+        self, dataset: Dataset, source_vertex: int, num_iterations: int
+    ) -> driver.ExecutionResult:
 
-        output = check_output([str(self.exec_path(AlgorithmName.bfs)),
-                               f"--src={source_vertex}",
-                               f"--num-runs={num_iterations + 1}",
-                               f"--undirected={int(not dataset.get_directed())}",
-                               f"--graph-file={dataset.path}",
-                               f"--graph-type={self.type}",
-                               f"--device={self.device}"])
+        output = check_output(
+            [
+                str(self.exec_path(AlgorithmName.bfs)),
+                f"--src={source_vertex}",
+                f"--num-runs={num_iterations + 1}",
+                f"--undirected={int(not dataset.get_directed())}",
+                f"--graph-file={dataset.path}",
+                f"--graph-type={self.type}",
+                f"--device={self.device}",
+            ]
+        )
         return DriverGunrock._parse_output(output)
 
-    def run_sssp(self,
-                 dataset: Dataset,
-                 source_vertex: int,
-                 num_iterations: int) -> driver.ExecutionResult:
+    def run_sssp(
+        self, dataset: Dataset, source_vertex: int, num_iterations: int
+    ) -> driver.ExecutionResult:
 
-        output = check_output([str(self.exec_path(AlgorithmName.sssp)),
-                               f"--src={source_vertex}",
-                               f"--num-runs={num_iterations + 1}",
-                               f"--undirected={int(not dataset.get_directed())}",
-                               f"--graph-file={dataset.path}",
-                               f"--graph-type={self.type}",
-                               f"--device={self.device}"])
+        output = check_output(
+            [
+                str(self.exec_path(AlgorithmName.sssp)),
+                f"--src={source_vertex}",
+                f"--num-runs={num_iterations + 1}",
+                f"--undirected={int(not dataset.get_directed())}",
+                f"--graph-file={dataset.path}",
+                f"--graph-type={self.type}",
+                f"--device={self.device}",
+            ]
+        )
         return DriverGunrock._parse_output(output)
 
-    def run_tc(self,
-               dataset: Dataset,
-               num_iterations: int) -> driver.ExecutionResult:
+    def run_tc(self, dataset: Dataset, num_iterations: int) -> driver.ExecutionResult:
 
-        output = check_output([str(self.exec_path(AlgorithmName.tc)),
-                               f"--num-runs={num_iterations + 1}",
-                               f"--undirected={int(not dataset.get_directed())}",
-                               f"--graph-file={dataset.path}",
-                               f"--graph-type={self.type}",
-                               f"--device={self.device}"])
+        output = check_output(
+            [
+                str(self.exec_path(AlgorithmName.tc)),
+                f"--num-runs={num_iterations + 1}",
+                f"--undirected={int(not dataset.get_directed())}",
+                f"--graph-file={dataset.path}",
+                f"--graph-type={self.type}",
+                f"--device={self.device}",
+            ]
+        )
         return DriverGunrock._parse_output(output)
 
     def tool_name(self) -> ToolName:
