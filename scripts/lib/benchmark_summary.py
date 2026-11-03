@@ -99,21 +99,17 @@ class BenchmarkSummary:
         return items
 
     def dump(self, format: OutputFormat, output_dir: Path, results_printer: Callable):
-        output_dir.mkdir(exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
         output = output_dir / datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")
         output.mkdir(exist_ok=False)
-        recent_link = output_dir / "recent"
-        if recent_link.exists() or recent_link.is_symlink():
-            recent_link.unlink()
-        os.symlink(output.name, recent_link, target_is_directory=True)
-
-        print_status("summary", "dump", f"symlink: {recent_link}, original: {output}")
 
         if format == OutputFormat.raw:
-
             def process_result(t):
                 algo, dataset, tool, result = t
-                return f"algo: {algo}, dataset: {dataset}, tool: {tool}, result: {results_printer.print(result)}"
+                return (
+                    f"algo: {algo}, dataset: {dataset}, tool: {tool}, "
+                    f"result: {results_printer.print(result)}"
+                )
 
             processed_measurements = list(map(process_result, self.measurements_list()))
             output_file_name = (output / "raw").with_suffix(format.extension())
@@ -121,21 +117,57 @@ class BenchmarkSummary:
                 print(*processed_measurements, sep="\n", file=out_file)
 
         elif format == OutputFormat.csv:
-            for algo, algo_results in self.results_per_algorithm():
-                algo_output = (output / str(algo)).with_suffix(format.extension())
+            # Keep CSV values numeric so they can be loaded directly by pandas,
+            # spreadsheet software, and plotting scripts.
+            metric_names = ("warm_up_ms", "avg_ms", "median_ms", "stdev_ms")
+            tools = [str(tool) for tool in self.tools()]
+            fieldnames = ["dataset"] + [
+                f"{tool}_{metric}" for tool in tools for metric in metric_names
+            ]
 
-                if algo_results == {}:
+            for algo, algo_results in self.results_per_algorithm():
+                if not algo_results:
                     continue
-                all_tools = map(str, list(list(algo_results.values())[0].keys()))
+                algo_output = (output / str(algo)).with_suffix(format.extension())
                 with algo_output.open("w") as algo_file:
-                    csv_writer = csv.DictWriter(algo_file, ["dataset", *all_tools])
+                    csv_writer = csv.DictWriter(algo_file, fieldnames)
                     csv_writer.writeheader()
                     for dataset_name, dataset_results in algo_results.items():
-                        csv_row = {}
+                        csv_row = {"dataset": dataset_name}
                         for tool, result in dataset_results.items():
-                            csv_row[str(tool)] = results_printer.print(result)
-                        csv_row["dataset"] = dataset_name
+                            prefix = str(tool)
+                            csv_row[f"{prefix}_warm_up_ms"] = f"{result.warm_up:.6f}"
+                            csv_row[f"{prefix}_avg_ms"] = f"{result.avg():.6f}"
+                            csv_row[f"{prefix}_median_ms"] = f"{result.median():.6f}"
+                            csv_row[f"{prefix}_stdev_ms"] = f"{result.stdev():.6f}"
                         csv_writer.writerow(csv_row)
 
         else:
             raise Exception(f"Format {format.name} is not supported")
+
+        legacy_recent = output_dir / "recent"
+        if legacy_recent.exists() or legacy_recent.is_symlink():
+            legacy_recent.unlink()
+        for tool in self.tools():
+            recent_link = output_dir / f"recent_{tool}"
+            if recent_link.exists() or recent_link.is_symlink():
+                recent_link.unlink()
+            os.symlink(
+                output.name,
+                recent_link,
+                target_is_directory=True,
+            )
+            print_status(
+                "summary",
+                "dump",
+                f"symlink: {recent_link}, original: {output}",
+            )
+
+    def tools(self) -> List[ToolName]:
+        return sorted(
+            {
+                tool
+                for _, _, tool, _ in self.measurements_list()
+            },
+            key=str,
+        )

@@ -31,7 +31,7 @@ class DriverLaGraph(Driver):
                 [self.exec_path(AlgorithmName.bfs), dataset.path, sources_file.name]
             )
 
-            return DriverLaGraph._parse_output(output, "parent only", 9, "warmup", 4)
+            return DriverLaGraph._parse_output(output, "level only", 9, "warmup", 4)
 
     def run_sssp(
         self, dataset: Dataset, source_vertex: int, num_iterations: int
@@ -39,20 +39,29 @@ class DriverLaGraph(Driver):
 
         with TemporarySourcesFile([source_vertex + 1] * num_iterations) as sources_file:
             output = check_output(
-                [self.exec_path(AlgorithmName.sssp), dataset.path, sources_file.name]
+                [
+                    self.exec_path(AlgorithmName.sssp),
+                    dataset.path,
+                    sources_file.name,
+                    "1",
+                ]
             )
 
-            return DriverLaGraph._parse_output(output, "sssp", 8)
+            return DriverLaGraph._parse_output(output, "sssp", 8, "warmup:", 1)
 
     def run_tc(self, dataset: Dataset, num_iterations: int) -> ExecutionResult:
 
-        output = check_output([self.exec_path(AlgorithmName.tc), dataset.path])
+        output = check_output(
+            [self.exec_path(AlgorithmName.tc), dataset.path, str(num_iterations)]
+        )
 
         return DriverLaGraph._parse_output(output, "trial ", 2, "nthreads: ", 3)
 
     def run_pr(self, dataset: Dataset, num_iterations: int) -> ExecutionResult:
 
-        output = check_output([self.exec_path(AlgorithmName.pr), dataset.path])
+        output = check_output(
+            [self.exec_path(AlgorithmName.pr), dataset.path, str(num_iterations)]
+        )
 
         return DriverLaGraph._parse_output(output, "trial:", 3, "warmup:", 1)
 

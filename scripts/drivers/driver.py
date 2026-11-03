@@ -141,7 +141,9 @@ class Driver:
         }
         return can_run[algo](dataset)
 
-    def run(self, dataset: Dataset, algo: AlgorithmName) -> ExecutionResult:
+    def run(
+        self, dataset: Dataset, algo: AlgorithmName, iterations: int = None
+    ) -> ExecutionResult:
         if not self.can_run(dataset, algo):
             raise Exception(
                 f"Algorithm {str(algo)} can not be run on the dataset {dataset.name}"
@@ -149,11 +151,14 @@ class Driver:
 
         dataset_category = dataset.get_category()
 
-        iterations = dataset_category.iterations()
+        if iterations is None:
+            iterations = dataset_category.iterations()
+        if iterations < 1:
+            raise ValueError("iterations must be positive")
         source = config.DEFAULT_SOURCE
 
         self.print_status(
-            "run", f"begin {algo.name}", f"iterations={iterations}", f"soure={source}"
+            "run", f"begin {algo.name}", f"iterations={iterations}", f"source={source}"
         )
 
         result: ExecutionResult = None

@@ -247,6 +247,9 @@ class DatasetSizeInfo:
     iterations: int
 
 
+DATASET_ITERATIONS = 3
+
+
 class DatasetSize(Enum):
     """
     Size configurations

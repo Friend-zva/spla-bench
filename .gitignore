@@ -7,6 +7,7 @@
 ## Build files inside deps directory
 /deps/**/build
 /deps/**/bin
+/deps/
 
 ## Python files
 /**/__pycache__
