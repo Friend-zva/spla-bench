@@ -45,6 +45,21 @@ def _datasets(results: Dict[str, Dict[str, Dict[str, float]]]) -> List[str]:
     return sorted(datasets)
 
 
+def _dataset_labels(
+    datasets: Iterable[str],
+    values: Dict[str, Dict[str, float]],
+) -> List[str]:
+    labels = []
+    for dataset in datasets:
+        spla = values.get(f"{dataset}:spla", {}).get("median", math.nan)
+        lagraph = values.get(f"{dataset}:lagraph", {}).get("median", math.nan)
+        if math.isfinite(spla) and math.isfinite(lagraph) and spla > 0:
+            labels.append(f"{dataset}\n({lagraph / spla:.1f}x)")
+        else:
+            labels.append(dataset)
+    return labels
+
+
 def _draw_algorithm(
     algorithm: str,
     datasets: Iterable[str],
@@ -120,7 +135,7 @@ def _draw_algorithm(
 
     ax.yaxis.set_major_formatter(LogFormatterMathtext())
     ax.set_xticks(x)
-    ax.set_xticklabels(datasets, rotation=20, ha="right")
+    ax.set_xticklabels(_dataset_labels(datasets, values), rotation=20, ha="center")
     if show_graph_label:
         ax.set_xlabel("Graph, name")
     ax.grid(axis="y", alpha=0.25)

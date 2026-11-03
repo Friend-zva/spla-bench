@@ -151,6 +151,16 @@ This list represents datasets, on which the benchmarks will be run.
 
 To execute benchmarks, use [`scripts/benchmark.py`](./scripts/benchmark.py) script.
 
+To visualize every SPLA GPU timing from dump files, run:
+
+```shell
+$ python3 scripts/plot_spla_dump_runs.py dump_<dataset>_spla.txt
+```
+
+The first timing in the dump is marked by a red point; all other points are
+blue. The horizontal scale is in seconds with one-second tick marks. Use
+`--output FILE` to choose the PNG path.
+
 To run benchmarks, just execute it
 
 ```shell
@@ -184,6 +194,10 @@ Use `--iterations N` to override the default 40 measured runs. The value is
 passed to SPLA directly, to the BFS/SSSP source list for LAGraph, and to the
 PageRank/triangle-counting trial loops in the LAGraph benchmarks. Each
 benchmark's separate warm-up remains outside these measured runs.
+
+Use `--dump` to save subprocess stdout beside the CSV in
+`benchmarks/<run>/dump_<dataset>_<tool>.txt`. If several tools are run for one dataset, the
+file contains a separate command header and output section for each run.
 
 CSV output contains numeric columns for every tool:
 `<tool>_warm_up_ms`, `<tool>_avg_ms`, `<tool>_median_ms`, and

@@ -69,8 +69,14 @@ def main():
         type=int,
         help="Number of measured runs (overrides the dataset-size default)",
     )
+    parser.add_argument(
+        "--dump",
+        action="store_true",
+        help="Save each command's stdout beside the CSV as dump_<dataset>_<tool>.txt",
+    )
 
     args = parser.parse_args()
+    dump_dir = util.configure_dump(args.dump, args.output)
 
     drivers: List[Driver] = []
     if args.tool is None:
@@ -114,12 +120,13 @@ def main():
                 for driver in drivers:
                     status = f"algo: {algo}, dataset: {dataset.name}, tool: {str(driver.tool_name())}"
                     print_status(status, "start benchmarking")
+                    util.set_dump_tool(str(driver.tool_name()))
                     result = driver.run(dataset, algo, args.iterations)
                     print_status(status, "finish benchmarking")
                     summary.add_measurement(driver.tool_name(), dataset, algo, result)
                 print_status(status_algo_dataset, "finish benchmarking")
     finally:
-        summary.dump(args.format, args.output, args.printer)
+        summary.dump(args.format, args.output, args.printer, run_dir=dump_dir)
 
 
 if __name__ == "__main__":

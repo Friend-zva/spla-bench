@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 from drivers.driver import ExecutionResult
 from lib.algorithm import AlgorithmName
@@ -98,10 +98,20 @@ class BenchmarkSummary:
                     items.append((algo, dataset_name, tool, result))
         return items
 
-    def dump(self, format: OutputFormat, output_dir: Path, results_printer: Callable):
+    def dump(
+        self,
+        format: OutputFormat,
+        output_dir: Path,
+        results_printer: Callable,
+        run_dir: Optional[Path] = None,
+    ):
         output_dir.mkdir(parents=True, exist_ok=True)
-        output = output_dir / datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")
-        output.mkdir(exist_ok=False)
+        if run_dir is None:
+            output = output_dir / datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")
+            output.mkdir(exist_ok=False)
+        else:
+            output = run_dir
+            output.mkdir(parents=True, exist_ok=True)
 
         if format == OutputFormat.raw:
             def process_result(t):
