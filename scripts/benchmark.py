@@ -64,6 +64,11 @@ def main():
         default=ResultsPrinter.all,
         help="Measurement printer",
     )
+    parser.add_argument(
+        "--iterations",
+        type=int,
+        help="Number of measured runs (overrides the dataset-size default)",
+    )
 
     args = parser.parse_args()
 
@@ -109,7 +114,7 @@ def main():
                 for driver in drivers:
                     status = f"algo: {algo}, dataset: {dataset.name}, tool: {str(driver.tool_name())}"
                     print_status(status, "start benchmarking")
-                    result = driver.run(dataset, algo)
+                    result = driver.run(dataset, algo, args.iterations)
                     print_status(status, "finish benchmarking")
                     summary.add_measurement(driver.tool_name(), dataset, algo, result)
                 print_status(status_algo_dataset, "finish benchmarking")

@@ -247,7 +247,7 @@ class DatasetSizeInfo:
     iterations: int
 
 
-DATASET_ITERATIONS = 3
+DATASET_ITERATIONS = 41
 
 
 class DatasetSize(Enum):
@@ -261,11 +261,11 @@ class DatasetSize(Enum):
     """
 
     # `size` = DatasetSizeInfo(`max_edges`, `iterations`)
-    tiny = DatasetSizeInfo(max_n_edges=5000, iterations=50)
-    small = DatasetSizeInfo(max_n_edges=80000, iterations=20)
-    medium = DatasetSizeInfo(max_n_edges=500000, iterations=10)
-    large = DatasetSizeInfo(max_n_edges=2000000, iterations=5)
-    extra_large = DatasetSizeInfo(max_n_edges=None, iterations=2)
+    tiny = DatasetSizeInfo(max_n_edges=5000, iterations=DATASET_ITERATIONS)
+    small = DatasetSizeInfo(max_n_edges=80000, iterations=DATASET_ITERATIONS)
+    medium = DatasetSizeInfo(max_n_edges=500000, iterations=DATASET_ITERATIONS)
+    large = DatasetSizeInfo(max_n_edges=2000000, iterations=DATASET_ITERATIONS)
+    extra_large = DatasetSizeInfo(max_n_edges=None, iterations=DATASET_ITERATIONS)
 
     def iterations(self):
         return self.value.iterations
@@ -339,25 +339,28 @@ or to the .mtx
 BENCHMARK_DATASETS = [
     # '1128_bus',
     # 'bcspwr03',
-    # 'soc-LiveJournal',
-    # 'hollywood-09',
+    "hollywood-09",
+    # "soc-LiveJournal1_sym", # "soc-LiveJournal1",
+    "road_central",
     # 'com-Orcut',
-    # 'roadNet-CA',
+    # "roadNet-CA",
     # 'indochina-2004',
     # 'cit-Patents',
-    "coAuthorsCiteseer",
-    # 'coPapersDBLP'
+    # "coAuthorsCiteseer",
+    "coPapersDBLP",
+    "belgium_osm",
+    "rgg_n_2_22_s0",
 ]
 
 """
 Path to the benchmarks output directory
 
 After each run of ./benchark.py script in the
-BENCHMARK_OUTPUT will be created folder with the bechmark results
+BENCHMARK_OUTPUT will be created folder with the benchmark results
 in .csv or .txt format. The folder will have name of the moment,
-when benchmarks were executed. Also, a symlink BENCHMARK_OUTPUT/recent
-will be created, which refers at the folder with the results
-of the most recent benchmarks run.
+when benchmarks were executed. Also, symlinks
+BENCHMARK_OUTPUT/recent_spla and BENCHMARK_OUTPUT/recent_lagraph
+will be created, which refer to the most recent benchmark folder.
 
 [MUTABLE]
 

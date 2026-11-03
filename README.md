@@ -11,7 +11,7 @@ Part of the Spla research project.
 - BFS (breadth-first search) for directed graphs with arbitrary values (only structure required)
 - SSSP (single-source the shortest paths) for directed graphs with float values
 - TC (triangles counting) for directed graphs (integer values stored)
-- PR (PageRank) for SPLA and LAGraph
+- PR (PageRank) for Spla and LAGraph
 - **Future:** CC (connected components)
 
 ### Frameworks
@@ -74,23 +74,25 @@ optional arguments:
 #### GraphBLAST
 
 Prerequisites:
- - Cuda Toolkit
- - Compatible GCC (8 for CUDA 10)
- - Boost library
- - Make
+
+- Cuda Toolkit
+- Compatible GCC (8 for CUDA 10)
+- Boost library
+- Make
 
 #### Gunrock
 
 Prerequisites:
+
 - Cuda Toolkit
 - Compatible GCC (8 for CUDA 10)
 - Boost library
 - CMake & Make
 
-
 #### Spla
 
 Prerequisites:
+
 - C++ Compiler with C++ 17 support
 - OpenCL 1.2+ SDK
 - Boost library
@@ -99,6 +101,7 @@ Prerequisites:
 #### LaGraph
 
 Prerequisites:
+
 - Make
 - C++ Compiler which is visible by Make
 - GraphBLAS
@@ -137,10 +140,12 @@ You also can test your local `.mtx` dataset. To do this, add a JSON object, whic
 }
 ```
 
-After you set the dataset url, or configured its the local version, please add its name to the `BENCHMARK_DATASETS` list in the [`scripts/config.py`](./scripts/config.py). This list represents datasets, on which the bechmarks will be run. 
+After you set the dataset url, or configured its the local version, please add its
+name to the `BENCHMARK_DATASETS` list in the [`scripts/config.py`](./scripts/config.py).
+This list represents datasets, on which the benchmarks will be run.
 
 > Note: Name of the dataset (key in this dictionary) must match
-name of the `.mtx` file in the archive
+> name of the `.mtx` file in the archive
 
 ### Execute benchmarks
 
@@ -165,6 +170,8 @@ optional arguments:
                         Format to dump benchmark results
   --printer {all,median}
                         Measurement printer
+  --iterations ITERATIONS
+                        Number of measured runs (overrides the dataset-size default)
 ```
 
 As you can see, it has different run configurations.
@@ -173,6 +180,31 @@ They all described in the help section. It is worth mentioning, that `printer` c
 - `all` will print all information: average time, median and standard deviation
 - `median` will print only the median time
 
+Use `--iterations N` to override the default 40 measured runs. The value is
+passed to SPLA directly, to the BFS/SSSP source list for LAGraph, and to the
+PageRank/triangle-counting trial loops in the LAGraph benchmarks. Each
+benchmark's separate warm-up remains outside these measured runs.
+
+CSV output contains numeric columns for every tool:
+`<tool>_warm_up_ms`, `<tool>_avg_ms`, `<tool>_median_ms`, and
+`<tool>_stdev_ms`. Results are stored directly in a timestamped directory.
+The `benchmarks/recent_spla` and
+`benchmarks/recent_lagraph` links point directly to the latest results for the
+benchmark run. They may point to the same directory because one run contains
+results for both tools.
+
+To build PR and TC plots from a benchmark run directory, run:
+
+```shell
+$ python3 scripts/plot_benchmarks.py --input benchmarks/main
+```
+
+The script reads `spla_pr.csv` and `spla_tc.csv`, plots median execution time
+in seconds on a logarithmic axis, and marks each warm-up value with an `x`.
+It writes `pr.png`, `tc.png`, and `all_algorithms.png` to `plots/`. Use
+`--input PATH` to select another timestamped benchmark directory and
+`--error-bars none` to hide standard-deviation bars. Install `matplotlib`
+first if it is not available.
 
 #### How the benchmark works
 
@@ -182,7 +214,6 @@ All the specified algorithms will be built automatically, using a configuration 
 Before using each dataset, the script will
 extract additional information about it: if the graph is directed and what is the type of the values on the edges. Retrieved information will
 be stored in the properties file ([`datasets/properties.json`](datasets/properties.json) by default)
-
 
 The script also accepts information about which algorithms you want to test.
 Therefore, if the build finishes without any errors, it will start testing each algorithm on every possible dataset (if it fits it by orientation, weighting).
@@ -201,7 +232,7 @@ spla-bench
 │   ├── lagraph - LAGraph library (submodule)
 │   ├── graphblast - GraphBLAST library (submodule)
 │   └── gunrock - Gunrock library (submodule)
-├── ide - files to setup local ide for development 
+├── ide - files to setup local ide for development
 └── scripts - python sripts to prepare and run benchmarks
 ```
 
